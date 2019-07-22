@@ -1,0 +1,115 @@
+# Convert-object-to-float64-int64
+
+# I wrote this in order to tackle the tricky element of preprocessing data for an ML model, whatever it be. The case is we need numbers, but what happens when you want all the columns in float64 or int32 form, my question is, how can we do this when we are under the constraints of a job interview?
+# Ready?
+
+
+# Get your library right:
+import pandas as pd
+
+
+# Now I create this Data Frame where col_1 and col_3 are strings (object) and col_2 and col_4 are integers. 
+df = pd.DataFrame({ 'col_1': ['a', 'b', 'c'],
+                    'col_2': [1, 2, 3],
+                    'col_3': ['d', 'e', 'f'],
+                    'col_4': [4, 5, 6]})
+print (df)
+
+
+     col_1	col_2	 col_3	 col_4
+    ____________________________
+  0|    a	    1	     d	     4
+  1|    b	    2	     e	     5
+  2|    c	    3	     f	     6
+  3|    a     1      d       4 
+  4|    b     2      e       5
+  5|    c     3      f       6
+ 
+# Next I make sure I know my dtypes. Even if the DataFrame is small, I think that it is a good practice to integrate the exploration of dtypes. At some point you will encounter a Data Frame that is huge and you will be happy you learned this trick (:
+
+print (df.dtypes)
+
+col_1    object
+col_2     int64
+col_3    object
+col_4     int64
+dtype: object
+
+# Voila, we get a nice view of our dtypes (: As you can see here, strings are known as 'object,' and this category extends to ALL strings. Every string is an object!
+# Okay, so now what should we do if we want to put this in an ML model?
+.
+..
+...
+....
+.....
+......
+.......
+........
+.........
+..........
+...........
+............
+# If you guessed that it was convert the object types to integers, then you are right!
+# But how?
+
+# First we need to isolate our target variables! What are our target variables? What do we want to do? We want to use ML! But to do that we must convert data types that are objects to integers! We have to ISOLATE the objects in order to successully convert ONLY the target variables to another data type!
+.
+..
+...
+....
+.....
+......
+.......
+........
+.........
+..........
+...........
+............
+# Step 1: Isolate
+columns_that_are_objects=df.columns[df.dtypes.eq('object')]
+
+print(columns_that_are_objects)
+
+# Voila!
+Index(['col_1', 'col_3'], dtype='object')
+
+# Step 2: Convert Isolated variables
+# We will make a loop.
+# Let's parse this badboy.
+
+for x in columns_that_are_objects:
+    df[x] = pd.factorize(df[x])[0]
+    
+# What we are saying is the following:
+# for ANY x--or ANY variable you so choose--in columns_that_are_objects, let's do this to that variable in columns_that_are_objects:
+# let's use the PANDAS library and its command, factorize, to "Encode the object as an enumerated type or categorical variable[1]." All that means is that the string is forces into numerical value. 
+
+# Step 3: Look at the dtypes
+
+print(df)
+
+col_1    int64
+col_2    int64
+col_3    int64
+col_4    int64
+dtype: object
+ 
+# Now we look at our df
+
+     col_1	col_2	 col_3	 col_4
+    ____________________________
+  0|    0	    1	     0	     4
+  1|    1	    2	     1	     5
+  2|    2	    3	     2	     6
+  3|    0     1      0       4 
+  4|    1     2      1       5
+  5|    2     3      2       6
+  
+# Now we have converted our dtypes. As you can see in col_1 row 0 and row 3 were bot 'a,' however, because we used factorize() we were able to maintain the unique value of 'a' in a numerical form.
+
+
+# Don't give up (: 
+# You can do this!
+_________________________________________________________________________________________________________
+# Sources
+# [1] https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.factorize.html?highlight=factorize
